@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAシンボルマーク テンプレート</title>
+<style>
+  :root{
+    --bg:#f4f3f0; --card:#ffffff; --ink:#1a1a1a; --sub:#6b6b6b;
+    --line:#e3e1db; --accent:#1a1a1a; --accent-ink:#ffffff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#15161a; --card:#1e2025; --ink:#f2f2f0; --sub:#9a9a9a; --line:#2c2e34; --accent:#f2f2f0; --accent-ink:#15161a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:36px 32px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .mark{width:64px;height:auto;display:block;margin:0 auto 20px}
+  h1{font-size:19px;margin:0 0 6px;text-align:center;letter-spacing:.02em}
+  p.sub{color:var(--sub);font-size:13px;text-align:center;margin:0 0 28px;line-height:1.6}
+  form{display:flex;flex-direction:column;gap:12px}
+  input[type="password"]{
+    font-size:15px;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+    background:transparent;color:var(--ink);outline:none;text-align:center;letter-spacing:.05em;
+  }
+  input[type="password"]:focus{border-color:var(--ink)}
+  button{
+    font-size:14px;font-weight:600;padding:12px 14px;border-radius:10px;border:none;
+    background:var(--accent);color:var(--accent-ink);cursor:pointer;transition:opacity .15s;
+  }
+  button:hover{opacity:.85}
+  #err{color:#c0392b;font-size:12.5px;text-align:center;min-height:1.2em;margin-top:2px}
+  #gate{transition:opacity .2s}
+  #content{display:none}
+  #content.show{display:block}
+  #gate.hide{display:none}
+  .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+  .list a{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px 16px;border:1px solid var(--line);border-radius:10px;color:var(--ink);
+    text-decoration:none;font-size:14px;transition:border-color .15s;
+  }
+  .list a:hover{border-color:var(--ink)}
+  .list a span.tag{font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+  .empty{color:var(--sub);font-size:13px;text-align:center;line-height:1.7;padding:12px 0}
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg class="mark" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="2.4" color="var(--ink)">
+        <path d="M4 20 L18 4 L45 4 L20 32 L4 20 Z M20 32 L45 4 L45 12 L27 32 L20 32 Z"/>
+        <path d="M58 32 L70 4 L82 32 L70 24 Z M62 24 L70 6 L78 24 L70 32 Z" fill-rule="evenodd"/>
+      </g>
+    </svg>
+    <div id="gate">
+      <h1>DAシンボルマーク テンプレート</h1>
+      <p class="sub">合言葉を入力してください</p>
+      <form id="gateForm" autocomplete="off">
+        <input type="password" id="pw" placeholder="合言葉" required>
+        <button type="submit">開く</button>
+      </form>
+      <div id="err"></div>
+    </div>
+    <div id="content">
+      <h1>ダウンロード</h1>
+      <p class="sub">好きなテンプレートを選んでください</p>
+      <ul class="list" id="fileList">
+        <!-- ファイルはここに追加していきます -->
+      </ul>
+    </div>
+  </div>
+
+<script>
+  // ごく簡単な「合言葉」ゲート（本格的なアクセス制限ではありません）
+  var PASSPHRASE = "da2026"; // ← 運用者はここを好きな合言葉に変更してください
+
+  var files = [
+    // 例: { name: "テンプレート①（黒枠）", tag: "AI", href: "templates/DAシンボルマーク_テンプレート①.ai" }
+  ];
+
+  var listEl = document.getElementById('fileList');
+  if (files.length === 0){
+    var li = document.createElement('li');
+    li.className = 'empty';
+    li.textContent = '準備中です。もうしばらくお待ちください。';
+    listEl.appendChild(li);
+  } else {
+    files.forEach(function(f){
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = f.href;
+      a.setAttribute('download', '');
+      a.innerHTML = '<span>' + f.name + '</span><span class="tag">' + f.tag + '</span>';
+      li.appendChild(a);
+      listEl.appendChild(li);
+    });
+  }
+
+  document.getElementById('gateForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var val = document.getElementById('pw').value.trim();
+    if (val === PASSPHRASE){
+      document.getElementById('gate').classList.add('hide');
+      document.getElementById('content').classList.add('show');
+      try { sessionStorage.setItem('da_gate_ok', '1'); } catch(err){}
+    } else {
+      document.getElementById('err').textContent = '合言葉が違います';
+    }
+  });
+
+  try {
+    if (sessionStorage.getItem('da_gate_ok') === '1'){
+      document.getElementById('gate').classList.add('hide');
+      document.getElementById('content').classList.add('show');
+    }
+  } catch(err){}
+</script>
+</body>
+</html>
